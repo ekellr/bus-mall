@@ -12,4 +12,4 @@
 
 - As developer, Picard wants to write an app easy to maintain and updated once it is deployed.
 
-- As a member of the research team, Hiker wants to create an app that is easy to use, especially for people with little experience using applications. 
+- As a member of the research team, Hiker wants to create an app that is easy to use, especially for people with little experience using applications.
