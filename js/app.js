@@ -2,7 +2,7 @@
 
 var items = [
   new Item('bag', 'img/bag.jpg'),
-  new Item('banana',  'img/banana.jpg'),
+  new Item('banana', 'img/banana.jpg'),
   new Item('bathroom', 'img/bathroom.jpg'),
   new Item('boots', 'img/boots.jpg'),
   new Item('breakfast', 'img/breakfast.jpg'),
@@ -22,26 +22,45 @@ var items = [
   new Item('sweep', 'img/sweep.png'),
   new Item('usb', 'img/usb.gif'),
 ];
-var image1 = document.getElementById('image1');
-var image2 = document.getElementById('image2');
-var image3 = document.getElementById('image3');
 
-var imageOnClick = function (img){
+var imageOnClick = function (){
+  var img = event.target;
   img.item.clickCount++;
-  alert(img.name +  ' has been clicked ' + img.item.clickCount + ' times');
-}
+  setup();
+};
+
+var image1 = document.getElementById('image1');
+image1.addEventListener('click', imageOnClick);
+
+var image2 = document.getElementById('image2');
+image2.addEventListener('click', imageOnClick);
+
+var image3 = document.getElementById('image3');
+image3.addEventListener('click', imageOnClick);
+var mruItems = [];
 
 function setup () {
   setImageSource(image1);
   setImageSource(image2);
   setImageSource(image3);
-}
 
+  if(mruItems.length > 3){
+    mruItems = mruItems.slice(3);
+  }
+}
+// It selects a random image and sets the sourceof the specified image
 function setImageSource (img){
   var item = generateRandomItem();
+  while (isMRU(item)){
+    item = generateRandomItem();
+  }
+
   img.src = item.imageSource;
   img.name = item.name;
   img.item = item;
+  item.displayCount++;
+
+  mruItems.push(item);
 }
 
 function generateRandomItem () {
@@ -54,6 +73,16 @@ function Item (name, imageSource){
   this.imageSource = imageSource;
   this.clickCount = 0;
   this.displayCount = 0;
+}
+
+function isMRU (item){
+  for (var i = 0; i < mruItems.length; i++){
+    if (mruItems[i] == item){
+      return true;
+    }
+  }
+
+  return false;
 }
 
 //
