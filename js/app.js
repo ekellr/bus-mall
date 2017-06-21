@@ -25,8 +25,10 @@ var items = [
 var image1 = document.getElementById('image1');
 var image2 = document.getElementById('image2');
 var image3 = document.getElementById('image3');
+
 var imageOnClick = function (img){
-  alert(img.name);
+  img.item.clickCount++;
+  alert(img.name +  ' has been clicked ' + img.item.clickCount + ' times');
 }
 
 function setup () {
@@ -39,6 +41,7 @@ function setImageSource (img){
   var item = generateRandomItem();
   img.src = item.imageSource;
   img.name = item.name;
+  img.item = item;
 }
 
 function generateRandomItem () {
