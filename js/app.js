@@ -1,24 +1,26 @@
 'use strict';
 
-var itemNames = [
-  'bag',
-  'banana',
-  'bathroom',
-  'boots',
-  'breakfast',
-  'bubblegum',
-  'chair',
-  'cthulhu',
-  'dog-duck',
-  'dragon',
-  'pen',
-  'pet-sweep',
-  'scissors',
-  'shark',
-  'tauntaun',
-  'unicorn',
-  'water-can',
-  'wine-glass'
+var items = [
+  new Item('bag', 'img/bag.jpg'),
+  new Item('banana',  'img/banana.jpg'),
+  new Item('bathroom', 'img/bathroom.jpg'),
+  new Item('boots', 'img/boots.jpg'),
+  new Item('breakfast', 'img/breakfast.jpg'),
+  new Item('bubblegum', 'img/bubblegum.jpg'),
+  new Item('chair', 'img/chair.jpg'),
+  new Item('cthulhu', 'img/cthulhu.jpg'),
+  new Item('dog-duck', 'img/dog-duck.jpg'),
+  new Item('dragon', 'img/dragon.jpg'),
+  new Item('pen', 'img/pen.jpg'),
+  new Item('pet-sweep', 'img/pet-sweep.jpg'),
+  new Item('scissors', 'img/scissors.jpg'),
+  new Item('shark', 'img/shark.jpg'),
+  new Item('tauntaun', 'img/tauntaun.jpg'),
+  new Item('unicorn', 'img/unicorn.jpg'),
+  new Item('water-can', 'img/water-can.jpg'),
+  new Item('wine-glass', 'img/wine-glass.jpg'),
+  new Item('sweep', 'img/sweep.png'),
+  new Item('usb', 'img/usb.gif'),
 ];
 var image1 = document.getElementById('image1');
 var image2 = document.getElementById('image2');
@@ -35,19 +37,24 @@ function setup () {
 
 function setImageSource (img){
   var item = generateRandomItem();
-  var pathToItem = 'img/' + item + '.jpg';
-  img.src = pathToItem;
-  img.name = item;
+  img.src = item.imageSource;
+  img.name = item.name;
 }
 
 function generateRandomItem () {
-  var index = Math.floor(Math.random() * itemNames.length);
-  return itemNames[index];
+  var index = Math.floor(Math.random() * items.length);
+  return items[index];
 }
 
+function Item (name, imageSource){
+  this.name = name;
+  this.imageSource = imageSource;
+  this.clickCount = 0;
+  this.displayCount = 0;
+}
 
 //
-//Main
+//------------------------------------Main--------------------------------------
 //
 
 setup();
