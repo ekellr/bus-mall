@@ -5,7 +5,7 @@ var image2;
 var image3;
 
 var MAX_VOTES = 25;
-var totalVoteCount = 0;
+var totalClickCount = 0;
 
 var mruItems = [];
 
@@ -35,12 +35,13 @@ var items = [
 
 var imageOnClick = function (){
   var img = event.target;
-  img.item.voteCount++;
+  img.item.clickCount++;
 
-  totalVoteCount++;
+  totalClickCount++;
 
-  if (totalVoteCount >= MAX_VOTES){
+  if (totalClickCount >= MAX_VOTES){
     displayProductResults();
+    displayProductResultsChart(getItemNames(), getItemClickCounts());
 
     // disable the event handlers for the images
     tearDownImages();
@@ -104,7 +105,7 @@ function generateRandomItem () {
 function Item (name, imageSource){
   this.name = name;
   this.imageSource = imageSource;
-  this.voteCount = 0;
+  this.clickCount = 0;
   this.displayCount = 0;
 }
 
@@ -131,8 +132,8 @@ function displayProductResults(){
   for(var i = 0; i < items.length; i++)
   {
     var li = document.createElement('li');
-    li.innerText = items[i].voteCount + ' vote';
-    if (items[i].voteCount != 1){
+    li.innerText = items[i].clickCount + ' vote';
+    if (items[i].clickCount != 1){
       li.innerText += 's';
     }
     li.innerText += ' for the ' + items[i].name;
@@ -141,6 +142,57 @@ function displayProductResults(){
   }
 }
 
+function getItemNames() {
+  var names = [];
+  for(var i = 0; i < items.length; i++){
+    names.push(items[i].name);
+  }
+
+  return names;
+}
+
+function getItemClickCounts(){
+  var clickCounts = [];
+  for(var i = 0; i < items.length; i++){
+    clickCounts.push(items[i].clickCount);
+  }
+
+  return clickCounts;
+}
+
+
+function displayProductResultsChart(itemNames, itemValues){
+  var canvas = document.getElementById('productResultsChart');
+  var ctx = canvas.getContext('2d');
+
+  // modeled after the Getting Started example in the chartJS docs
+  var chart = new Chart(ctx, {
+    // The type of chart we want to create
+    type: 'bar',
+
+    // The data for our dataset
+    data: {
+      labels: itemNames,
+      datasets: [{
+        label: '# of Clicks',
+        backgroundColor: 'rgb(255, 99, 132)',
+        borderColor: 'rgb(255, 99, 132)',
+        data: itemValues,
+      }]
+    },
+
+    // Configuration options go here
+    options: {
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      }
+    }
+  });
+}
 
 function initialize(){
   initializeImages();
