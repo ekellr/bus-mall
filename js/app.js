@@ -1,45 +1,74 @@
 'use strict';
 
+var image1;
+var image2;
+var image3;
+
+var MAX_VOTES = 25;
+var totalVoteCount = 0;
+
+var mruItems = [];
+
 var items = [
-  new Item('bag', 'img/bag.jpg'),
-  new Item('banana', 'img/banana.jpg'),
-  new Item('bathroom', 'img/bathroom.jpg'),
-  new Item('boots', 'img/boots.jpg'),
-  new Item('breakfast', 'img/breakfast.jpg'),
-  new Item('bubblegum', 'img/bubblegum.jpg'),
-  new Item('chair', 'img/chair.jpg'),
-  new Item('cthulhu', 'img/cthulhu.jpg'),
-  new Item('dog-duck', 'img/dog-duck.jpg'),
-  new Item('dragon', 'img/dragon.jpg'),
-  new Item('pen', 'img/pen.jpg'),
-  new Item('pet-sweep', 'img/pet-sweep.jpg'),
-  new Item('scissors', 'img/scissors.jpg'),
-  new Item('shark', 'img/shark.jpg'),
-  new Item('tauntaun', 'img/tauntaun.jpg'),
-  new Item('unicorn', 'img/unicorn.jpg'),
-  new Item('water-can', 'img/water-can.jpg'),
-  new Item('wine-glass', 'img/wine-glass.jpg'),
-  new Item('sweep', 'img/sweep.png'),
-  new Item('usb', 'img/usb.gif'),
+  new Item('R2D2 Bag', 'img/bag.jpg'),
+  new Item('Banana Slicer', 'img/banana.jpg'),
+  new Item('iPad Stand for Bathroom', 'img/bathroom.jpg'),
+  new Item('Open-Toed Rain Boots', 'img/boots.jpg'),
+  new Item('Easybake Oven', 'img/breakfast.jpg'),
+  new Item('Meatball Bubble Gum', 'img/bubblegum.jpg'),
+  new Item('Gumby Chair', 'img/chair.jpg'),
+  new Item('Gargoyle', 'img/cthulhu.jpg'),
+  new Item('Duck Muzzle', 'img/dog-duck.jpg'),
+  new Item('Dragon Meat', 'img/dragon.jpg'),
+  new Item('Pen Utensils', 'img/pen.jpg'),
+  new Item('Pet Sweep', 'img/pet-sweep.jpg'),
+  new Item('Pizza Cutter Scissors', 'img/scissors.jpg'),
+  new Item('Shark Sleeping Bag', 'img/shark.jpg'),
+  new Item('Tauntaun Sleeping Bag', 'img/tauntaun.jpg'),
+  new Item('Unicorn Meat', 'img/unicorn.jpg'),
+  new Item('Escher Watering Can', 'img/water-can.jpg'),
+  new Item('Impossible Wine Glass', 'img/wine-glass.jpg'),
+  new Item('Baby Sweep', 'img/sweep.png'),
+  new Item('USB Tentacle', 'img/usb.gif'),
 ];
+
 
 var imageOnClick = function (){
   var img = event.target;
-  img.item.clickCount++;
-  setup();
+  img.item.voteCount++;
+
+  totalVoteCount++;
+
+  if (totalVoteCount >= MAX_VOTES){
+    displayProductResults();
+
+    // disable the event handlers for the images
+    tearDownImages();
+  }
+  else {
+    refreshImages();
+  }
 };
 
-var image1 = document.getElementById('image1');
-image1.addEventListener('click', imageOnClick);
+function initializeImages(){
+  image1 = document.getElementById('image1');
+  image1.addEventListener('click', imageOnClick);
 
-var image2 = document.getElementById('image2');
-image2.addEventListener('click', imageOnClick);
+  image2 = document.getElementById('image2');
+  image2.addEventListener('click', imageOnClick);
 
-var image3 = document.getElementById('image3');
-image3.addEventListener('click', imageOnClick);
-var mruItems = [];
+  image3 = document.getElementById('image3');
+  image3.addEventListener('click', imageOnClick);
+}
 
-function setup () {
+function tearDownImages()
+{
+  image1.removeEventListener('click', imageOnClick);
+  image2.removeEventListener('click', imageOnClick);
+  image3.removeEventListener('click', imageOnClick);
+}
+
+function refreshImages () {
   setImageSource(image1);
   setImageSource(image2);
   setImageSource(image3);
@@ -57,7 +86,11 @@ function setImageSource (img){
 
   img.src = item.imageSource;
   img.name = item.name;
+
+  // attach the Item instance this img is displaying
+  // so we don't have to look it up later in our onclick handler
   img.item = item;
+
   item.displayCount++;
 
   mruItems.push(item);
@@ -71,7 +104,7 @@ function generateRandomItem () {
 function Item (name, imageSource){
   this.name = name;
   this.imageSource = imageSource;
-  this.clickCount = 0;
+  this.voteCount = 0;
   this.displayCount = 0;
 }
 
@@ -85,8 +118,37 @@ function isMRU (item){
   return false;
 }
 
+function displayProductResults(){
+  var container = document.getElementById('productResults');
+
+  var header = document.createElement('h2');
+  header.innerHTML = 'The votes are in!';
+  container.appendChild(header);
+
+  var list = document.createElement('ul');
+  container.appendChild(list);
+
+  for(var i = 0; i < items.length; i++)
+  {
+    var li = document.createElement('li');
+    li.innerText = items[i].voteCount + ' vote';
+    if (items[i].voteCount != 1){
+      li.innerText += 's';
+    }
+    li.innerText += ' for the ' + items[i].name;
+
+    list.appendChild(li);
+  }
+}
+
+
+function initialize(){
+  initializeImages();
+  refreshImages();
+}
+
 //
 //------------------------------------Main--------------------------------------
 //
 
-setup();
+initialize();
