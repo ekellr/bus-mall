@@ -5,6 +5,7 @@ var image2;
 var image3;
 
 var MAX_VOTES = 25;
+var PREVIOUS_RESULTS_KEY = 'previousResults';
 var totalClickCount = 0;
 
 var mruItems = [];
@@ -32,7 +33,7 @@ var items = [
   new Item('USB Tentacle', 'img/usb.gif'),
 ];
 
-
+//Single event handler for all images
 var imageOnClick = function (){
   var img = event.target;
   img.item.clickCount++;
@@ -40,9 +41,10 @@ var imageOnClick = function (){
   totalClickCount++;
 
   if (totalClickCount >= MAX_VOTES){
-    displayProductResults();
-    displayProductResultsChart(getItemNames(), getItemClickCounts());
-
+    displayProductResults(items, 'The votes are in!');
+    displayProductResultsChart(getItemNames(items), getItemClickCounts(items));
+    var stringifiedItems = JSON.stringify(items);
+    localStorage.setItem(PREVIOUS_RESULTS_KEY, stringifiedItems);
     // disable the event handlers for the images
     tearDownImages();
   }
@@ -62,6 +64,7 @@ function initializeImages(){
   image3.addEventListener('click', imageOnClick);
 }
 
+//Stops listening to the event
 function tearDownImages()
 {
   image1.removeEventListener('click', imageOnClick);
@@ -78,7 +81,7 @@ function refreshImages () {
     mruItems = mruItems.slice(3);
   }
 }
-// It selects a random image and sets the sourceof the specified image
+//It selects a random image and sets the source of the specified image
 function setImageSource (img){
   var item = generateRandomItem();
   while (isMRU(item)){
@@ -88,8 +91,8 @@ function setImageSource (img){
   img.src = item.imageSource;
   img.name = item.name;
 
-  // attach the Item instance this img is displaying
-  // so we don't have to look it up later in our onclick handler
+// attach the Item instance this img is displaying
+// so we don't have to look it up later in our onclick handler
   img.item = item;
 
   item.displayCount++;
@@ -102,6 +105,7 @@ function generateRandomItem () {
   return items[index];
 }
 
+//Constructs an instance of an item and initializes its state
 function Item (name, imageSource){
   this.name = name;
   this.imageSource = imageSource;
@@ -109,6 +113,7 @@ function Item (name, imageSource){
   this.displayCount = 0;
 }
 
+//Use to determine if the specified item is a duplicate of
 function isMRU (item){
   for (var i = 0; i < mruItems.length; i++){
     if (mruItems[i] == item){
@@ -119,42 +124,43 @@ function isMRU (item){
   return false;
 }
 
-function displayProductResults(){
+function displayProductResults(dataItems, label){
   var container = document.getElementById('productResults');
+  container.innerHTML = '';
 
   var header = document.createElement('h2');
-  header.innerHTML = 'The votes are in!';
+  header.innerHTML = label;
   container.appendChild(header);
 
   var list = document.createElement('ul');
   container.appendChild(list);
 
-  for(var i = 0; i < items.length; i++)
+  for(var i = 0; i < dataItems.length; i++)
   {
     var li = document.createElement('li');
-    li.innerText = items[i].clickCount + ' vote';
-    if (items[i].clickCount != 1){
+    li.innerText = dataItems[i].clickCount + ' vote';
+    if (dataItems[i].clickCount != 1){
       li.innerText += 's';
     }
-    li.innerText += ' for the ' + items[i].name;
+    li.innerText += ' for the ' + dataItems[i].name;
 
     list.appendChild(li);
   }
 }
 
-function getItemNames() {
+function getItemNames(dataItems) {
   var names = [];
-  for(var i = 0; i < items.length; i++){
-    names.push(items[i].name);
+  for(var i = 0; i < dataItems.length; i++){
+    names.push(dataItems[i].name);
   }
 
   return names;
 }
 
-function getItemClickCounts(){
+function getItemClickCounts(dataItems){
   var clickCounts = [];
-  for(var i = 0; i < items.length; i++){
-    clickCounts.push(items[i].clickCount);
+  for(var i = 0; i < dataItems.length; i++){
+    clickCounts.push(dataItems[i].clickCount);
   }
 
   return clickCounts;
@@ -166,7 +172,7 @@ function displayProductResultsChart(itemNames, itemValues){
   var ctx = canvas.getContext('2d');
 
   // modeled after the Getting Started example in the chartJS docs
-  var chart = new Chart(ctx, {
+  new Chart(ctx, {
     // The type of chart we want to create
     type: 'bar',
 
@@ -197,6 +203,18 @@ function displayProductResultsChart(itemNames, itemValues){
 function initialize(){
   initializeImages();
   refreshImages();
+  initializePreviousResults();
+}
+
+function initializePreviousResults (){
+  if(localStorage.getItem (PREVIOUS_RESULTS_KEY) != null){
+    //load out previousResults from storage
+    var previousResults =  JSON.parse(localStorage.getItem (PREVIOUS_RESULTS_KEY));
+    //display loaded result
+    displayProductResults(previousResults, 'The previous votes were:' );
+    displayProductResultsChart(getItemNames(previousResults), getItemClickCounts(previousResults));
+  }
+  //alert('check');
 }
 
 //
